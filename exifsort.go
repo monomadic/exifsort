@@ -9,7 +9,7 @@ import "github.com/gosexy/exif"
 import "hash/crc32"
 
 func main() {
-    inputFile := "./test.jpg"
+    inputFile := "./_input/test.jpg"
     // open an exif reader and read the file from system
     reader := exif.New()
     err := reader.Open(inputFile)
@@ -62,7 +62,7 @@ func copyFile(src string, dest string) {
 }
 
 func constructPath(parsedDate time.Time) string {
-    return fmt.Sprintf("./%d/%02d/", parsedDate.Year(), int(parsedDate.Month()))
+    return fmt.Sprintf("./_output/%d/%02d/", parsedDate.Year(), int(parsedDate.Month()))
 }
 
 func constructFileName(inputFile string, parsedDate time.Time) string {
