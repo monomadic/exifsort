@@ -8,6 +8,14 @@ import "io"
 import "github.com/gosexy/exif"
 import "hash/crc32"
 
+// todo:
+// - recursively parse directory
+// - warn and skip when non-images are found
+// - take arguments for input dir and output dir
+// - fallback to file date/time if no exif data found
+// - support for movies with hash tags
+// - color support for terminal
+
 func main() {
     inputFile := "./_input/test.jpg"
     // open an exif reader and read the file from system
