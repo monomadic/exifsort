@@ -1,12 +1,14 @@
 package main
 
-import "fmt"
-import "time"
-import "os"
-import "io/ioutil"
-import "io"
+import (
+    "fmt"
+    "time"
+    "os"
+    "flag"
+    "path/filepath"
+)
+
 import "github.com/gosexy/exif"
-import "hash/crc32"
 
 // todo:
 // - recursively parse directory
@@ -15,58 +17,50 @@ import "hash/crc32"
 // - fallback to file date/time if no exif data found
 // - support for movies with hash tags
 // - color support for terminal
+// - multithreading
 
 func main() {
-    inputFile := "./_input/test.jpg"
+    // inputFile := "./_input/test.jpg"
+    inputDir := flag.Arg(0)
+    outputDir := flag.Arg(1)
+    fmt.Printf("Vars: %s %s\n\n", inputDir, outputDir)
+
+    filepath.Walk("./_input", fileScanFunc)
+
+    // destinationFile := fmt.Sprint(newDir, constructFileName(inputFile, parsedDate))
+    // fmt.Println("[+] creating file ", destinationFile)
+    // copyFile(inputFile, destinationFile)
+}
+
+func fileScanFunc(fileName string, _ os.FileInfo, _ error) (err error) {
+    fmt.Println(fileName)
+    reader := readExifData(fileName)
+    parsedDate, _ := getDateTime(reader)
+    newDir := constructPath(parsedDate)
+
+    fmt.Println("[+] creating dir ", newDir)
+    if os.MkdirAll(newDir, 0777) != nil {
+        panic(fmt.Sprintf("[!] Unable to create directory: %s\n", newDir))
+    }
+
+    destinationFile := fmt.Sprint(newDir, constructFileName(fileName, parsedDate))
+    fmt.Printf("[+] copying file %s to %s\n", fileName, destinationFile)
+    copyFile(fileName, destinationFile)
+
+    return nil
+}
+
+func readExifData(inputFile string) (*exif.Data) {
     // open an exif reader and read the file from system
     reader := exif.New()
     err := reader.Open(inputFile)
 
     // check to make sure we can read the exif data
     if err != nil {
-        fmt.Printf("Error: %s", err.Error())
+        fmt.Println("[!] Error: %s", err.Error())
     }
 
-    parsedDate, _ := getDateTime(reader)
-    newDir := constructPath(parsedDate)
-
-    fmt.Println("[+] creating dir ", newDir)
-    if os.MkdirAll(newDir, 0777) != nil {
-        panic(fmt.Sprintf("Unable to create directory: %s\n", newDir))
-    }
-
-    destinationFile := fmt.Sprint(newDir, constructFileName(inputFile, parsedDate))
-    fmt.Println("[+] creating file ", destinationFile)
-    copyFile(inputFile, destinationFile)
-}
-
-func getHash(filename string) (uint32, error) {
-    bs, err := ioutil.ReadFile(filename)
-    if err != nil {
-        return 0, err
-    }
-    h := crc32.NewIEEE()
-    h.Write(bs)
-    return h.Sum32(), nil
-}
-
-func copyFile(src string, dest string) {
-    reader, err := os.Open(src)
-    if err != nil {
-        panic(err)
-    }
-    defer reader.Close()
-
-    writer, err := os.Create(dest)
-    if err != nil {
-        panic(err)
-    }
-    defer writer.Close()
-
-    _, err = io.Copy(writer, reader)
-    if err != nil {
-        panic(err)
-    }
+    return reader
 }
 
 func constructPath(parsedDate time.Time) string {
