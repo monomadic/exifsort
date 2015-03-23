@@ -11,7 +11,6 @@ import (
 import "github.com/gosexy/exif"
 
 // todo:
-// - recursively parse directory
 // - warn and skip when non-images are found
 // - take arguments for input dir and output dir
 // - fallback to file date/time if no exif data found
@@ -33,7 +32,12 @@ func main() {
 }
 
 func fileScanFunc(fileName string, _ os.FileInfo, _ error) (err error) {
-    fmt.Println(fileName)
+    fmt.Printf("[.] Trying %s\n", fileName)
+    if err != nil { return err }
+
+    stat, err := os.Stat(fileName)
+    if stat.IsDir() { return nil }
+
     reader := readExifData(fileName)
     parsedDate, _ := getDateTime(reader)
     newDir := constructPath(parsedDate)
@@ -57,7 +61,7 @@ func readExifData(inputFile string) (*exif.Data) {
 
     // check to make sure we can read the exif data
     if err != nil {
-        fmt.Println("[!] Error: %s", err.Error())
+        fmt.Println("[!] Error:", err.Error())
     }
 
     return reader
