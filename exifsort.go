@@ -11,12 +11,14 @@ import (
 import "github.com/gosexy/exif"
 
 // todo:
+// - fix bug with EXIF
 // - take arguments for input dir and output dir
 // - fallback to file date/time if no exif data found
 // - warn and skip when non-images are found
 // - support for movies with hash tags
 // - color support for terminal
 // - multithreading
+// - count photos and show processing time
 
 func main() {
     // inputFile := "./_input/test.jpg"
