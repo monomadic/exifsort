@@ -11,9 +11,9 @@ import (
 import "github.com/gosexy/exif"
 
 // todo:
-// - warn and skip when non-images are found
 // - take arguments for input dir and output dir
 // - fallback to file date/time if no exif data found
+// - warn and skip when non-images are found
 // - support for movies with hash tags
 // - color support for terminal
 // - multithreading
@@ -23,12 +23,8 @@ func main() {
     inputDir := flag.Arg(0)
     outputDir := flag.Arg(1)
     fmt.Printf("Vars: %s %s\n\n", inputDir, outputDir)
-
     filepath.Walk("./_input", fileScanFunc)
-
-    // destinationFile := fmt.Sprint(newDir, constructFileName(inputFile, parsedDate))
-    // fmt.Println("[+] creating file ", destinationFile)
-    // copyFile(inputFile, destinationFile)
+    fmt.Println("Done.")
 }
 
 func fileScanFunc(fileName string, _ os.FileInfo, _ error) (err error) {
