@@ -1,1 +1,1 @@
-go build && ./exifsort
+go build -o bin/exifsort && ./bin/exifsort
